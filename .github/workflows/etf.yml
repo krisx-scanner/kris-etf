@@ -1,12 +1,18 @@
 name: etf-flows
-# Farside posts partial US spot BTC ETF flows ~6:30-8:30 PM ET and IBIT (final) ~midnight ET,
-# occasionally as late as ~4 AM ET. Run every 15 min from US market open through next morning ET
-# on weekdays, plus a 3-hourly catch-all. Times below are UTC.
+# Farside posts partial US spot BTC ETF flows ~23:30-01:30 UTC and the final day (IBIT) ~04:45-05:05 UTC
+# Tue-Sat, occasionally later (06:50, 08:40 UTC seen). Dense runs 04:40-06:00 UTC so the complete day is
+# live by 05:30 UTC even with GitHub's 5-20 min cron delays. All times UTC.
 on:
   schedule:
-    - cron: '*/15 13-23 * * 1-5'
-    - cron: '*/15 0-10 * * 2-6'
-    - cron: '7 */3 * * *'
+    - cron: '*/15 13-23 * * 1-5'      # US market hours + evening partials (Mon-Fri)
+    - cron: '*/15 0-3 * * 2-6'        # overnight partials (Tue-Sat)
+    - cron: '40,50 4 * * 2-6'         # dense final-post window starts
+    - cron: '*/10 5 * * 2-6'          # 05:00-05:50 every 10 min
+    - cron: '15 5 * * 2-6'            # guaranteed 05:15 run
+    - cron: '0 6 * * 2-6'
+    - cron: '30 6 * * 2-6'
+    - cron: '0 7,8,9,10 * * 2-6'      # catch-up for late days
+    - cron: '7 */3 * * *'             # 3-hourly safety net, every day
   workflow_dispatch:
 permissions:
   contents: write
